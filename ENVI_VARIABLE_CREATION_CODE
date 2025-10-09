@@ -4,7 +4,7 @@ LOAD
     ENVIRONMENT,
     SERVER_NAME,
     ACTIVE_FLAG
-FROM [lib://QSC_QLIK_SHARE/Monitoring_Apps/CONFIG_FILES/QLIKSENSE_ENVIRONMENT_DETAILS.xlsx]
+FROM [lib://FOLDERNAME/PATH/QLIKSENSE_ENVIRONMENT_DETAILS.xlsx]
 (ooxml, embedded labels, table is ENVI_DETAILS)
 WHERE 
 	Match(ACTIVE_FLAG,'1')>0
@@ -34,7 +34,7 @@ LOAD
     VariableName,
     LinkName,
     [$(vG.ENV_URL)]
-FROM [lib://QSC_QLIK_SHARE/Global_SET/Excel Files/URL.xlsx]
+FROM [lib://FOLDERNAME/PATH/Excel Files/URL.xlsx]
 (ooxml, embedded labels, table is URL_DETAILS)
 WHERE
 	Len(Trim([$(vG.ENV_URL)]))>0
