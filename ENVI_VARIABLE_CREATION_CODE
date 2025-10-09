@@ -1,0 +1,52 @@
+ENVIRONMENTS:
+REPLACE 
+LOAD
+    ENVIRONMENT,
+    SERVER_NAME,
+    ACTIVE_FLAG
+FROM [lib://QSC_QLIK_SHARE/Monitoring_Apps/CONFIG_FILES/QLIKSENSE_ENVIRONMENT_DETAILS.xlsx]
+(ooxml, embedded labels, table is ENVI_DETAILS)
+WHERE 
+	Match(ACTIVE_FLAG,'1')>0
+;
+
+/* 1 CHECK WHAT ENVIRONMENT WE ARE*/
+
+TEMP_ENV:
+REPLACE
+LOAD
+	ENVIRONMENT
+RESIDENT
+	ENVIRONMENTS
+WHERE
+	Match(SERVER_NAME,ComputerName())>0
+;
+
+//Let vG.ENV = Chr(39)&Peek('ENVIRONMENT',0,'TEMP_ENV')&Chr(39);
+Let vG.ENV_URL = Peek('ENVIRONMENT',0,'TEMP_ENV')&'_URL';
+
+DROP TABLE TEMP_ENV;
+
+Temp_URL:
+REPLACE 
+LOAD
+    Dashboard,
+    VariableName,
+    LinkName,
+    [$(vG.ENV_URL)]
+FROM [lib://QSC_QLIK_SHARE/Global_SET/Excel Files/URL.xlsx]
+(ooxml, embedded labels, table is URL_DETAILS)
+WHERE
+	Len(Trim([$(vG.ENV_URL)]))>0
+;
+
+TRACE ComputerName();
+set ErrorMode=0;       
+        FOR i = 0 to NoOfRows('Temp_URL') - 1
+
+        LET VariableName = Peek('VariableName', i, 'Temp_URL');
+     	LET '$(VariableName)' = Peek('$(vG.ENV_URL)', i, 'Temp_URL');
+        
+        NEXT i
+set ErrorMode=1;
+DROP TABLE Temp_URL, ENVIRONMENTS;
